@@ -1,0 +1,191 @@
+@model test2.Models.ViewModels.CreateEmpleadoViewModel
+
+<div class="container row">
+    <div class="col-md-6">
+        <h1>Crear Empleado</h1>
+
+        <form asp-action="Create" method="post">
+            <div class="row">
+                <div class="form-group col-md-6">
+                        <label asp-for="Empleado.Nombre" class="control-label"></label>
+                        <input asp-for="Empleado.Nombre" class="form-control" />
+                        <span asp-validation-for="Empleado.Nombre" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="Empleado.Apellido" class="control-label"></label>
+                    <input asp-for="Empleado.Apellido" class="form-control" />
+                    <span asp-validation-for="Empleado.Apellido" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Empleado.DepartamentoID">Departamento</label>
+            @if (Model.Departamentos != null)
+            {
+               <select id="departamentos" asp-for="Empleado.DepartamentoID" class="form-control">
+                <option value="">- Selecciona un Departamento -</option>
+                @foreach (var departamento in Model.Departamentos)
+                {
+                    <option value="@departamento.Id">
+                        @departamento.Name
+                    </option>
+                }
+            </select>
+            }
+            else
+            {
+                <p>No hay departamentos disponibles.</p>
+            }
+            </div>
+
+       
+            <div class="form-group">
+                <label asp-for="Empleado.Salario" class="control-label"></label>
+                <input asp-for="Empleado.Salario" class="form-control" />
+                <span asp-validation-for="Empleado.Salario" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+        
+                <label asp-for="Empleado.FechaDeNacimineto" class="control-label"></label>
+                <input asp-for="Empleado.FechaDeNacimineto" class="form-control" />
+                <span asp-validation-for="Empleado.Salario" class="text-danger"></span>
+            </div>
+
+            
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a class="btn btn-secondary" href="@Url.Action("Index")">Cancelar</a>
+        </form>
+
+    </div>
+
+   
+
+    <div class="col-md-6 ">
+       <h1>Roles y Departamentos</h1>
+   
+    <br>
+        <div class="input-group mb-3">
+           
+            <input id="input-departamento" class="form-control" placeholder="agregue un departamento" />
+
+            <div class="input-group-append">
+                <button id="save-departamento" class="btn btn-outline-secondary" type="button"><i class="bi bi-plus"></i></button>
+            </div>
+        </div>
+               
+        <div class="input-group mb-3">
+            
+            <input id="input-rol" class="form-control" placeholder="agregue un rol" />
+
+            <div class="input-group-append">
+                <button id="save-rol" class="btn btn-outline-secondary" type="button"><i
+                        class="bi bi-plus"></i></button>
+            </div>
+        </div>
+      
+       
+   
+      
+   </div>
+
+</div>
+ 
+
+
+
+    
+<div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
+    <strong ></strong> <span></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <script type="text/javascript">
+
+
+    
+        $(document).ready(function() {
+
+            var notification = $("#notification")
+
+            
+
+            var hostname = window.location.hostname;
+             var port = window.location.port;
+            // Código específico para la vista de crear producto
+            $('#save-departamento').click(function() {
+               var  departamentos = $("#departamentos");
+                var value = $("#input-departamento").val();
+                if (value) {
+                    $.ajax({
+                        url: "http://"+hostname+':'+port+'/Departamentos/Create', // Asumiendo que tienes un método en el controlador
+                        type: 'POST',
+                         contentType: 'application/json',
+                        data:JSON.stringify( { Name: value }),
+                        success: function(data) {
+                            
+                            if(data.status=="success"){
+
+                                notification.removeClass('alert-warning');
+                                notification.addClass('alert-success');
+                                notification.find("strong").text(data.status)
+                                notification.find("span").text(data.message)
+                                notification.fadeIn()
+
+
+                                console.log(departamentos)
+
+                                const option = $('<option>', {})
+                                option.html(data.data.name)
+                                option.attr("value", data.data.id)
+
+
+                                departamentos.append(option)
+
+                                console.log(data)
+
+                                setTimeout(()=>{
+                                    notification.fadeOut()
+                                },5000)
+                            }else{
+
+                                notification.removeClass('alert-success');
+                                notification.addClass('alert-danger');
+                                notification.find("strong").text(data.status)
+                                notification.find("span").text(data.message)
+                                notification.fadeIn()
+                                setTimeout(() => {
+                                    notification.fadeOut()
+                                }, 5000)
+                                
+                            }
+                           
+
+                           @*  $('#subcategorySelect').empty();
+                            $.each(data, function(index, item) {
+                                $('#subcategorySelect').append('<option value="' + item.id + '">' + item.name + '</option>');
+                            }); *@
+                        },
+                        error: function() {
+                            alert('Error al cargar las subcategorías');
+                        }
+                    });
+                }
+            });
+
+
+          
+              
+              
+        });
+    </script>
+}

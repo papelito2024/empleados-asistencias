@@ -1,0 +1,36 @@
+@model IEnumerable<test2.Models.Empleado>
+@{
+    ViewData["Title"] = "Empleados";
+}
+
+<h1>Empleados</h1>
+
+<p>
+    <a class="btn btn-primary" href="@Url.Action("Create")">Crear nuevo empleado</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Salario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Rol.Name</td>
+                <td>@item.Salario</td>
+                <td>
+                    <a class="btn btn-info" href="@Url.Action("Details", new { id = item.Id })">Ver</a>
+                    <a class="btn btn-warning" href="@Url.Action("Edit", new { id = item.Id })">Editar</a>
+                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = item.Id })">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
