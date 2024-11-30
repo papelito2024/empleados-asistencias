@@ -18,22 +18,14 @@ namespace test2.Data
 
             public DbSet<Departamento> Departamentos { get; set; }
 
-            public DbSet<Rol> Roles { get; set; }
+            public DbSet<Posicion> Posiciones { get; set; }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);  // Llamada al método base
 
-                // Configuración de la relación entre Producto y Categoria
-                modelBuilder.Entity<Empleado>()
-                    .HasOne(p => p.Rol)
-                    .WithMany(c => c.Empleados)
-                    .HasForeignKey(p => p.RolID);  // Definir la clave foránea
-
-                modelBuilder.Entity<Empleado>()
-                .HasOne(p => p.Departamento)
-                .WithMany(c => c.Empleados)
-                .HasForeignKey(p => p.DepartamentoID);
+        
+    
             }
     }
 

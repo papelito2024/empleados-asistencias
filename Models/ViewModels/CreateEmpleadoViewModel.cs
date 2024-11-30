@@ -9,8 +9,9 @@ namespace test2.Models.ViewModels
     public class CreateEmpleadoViewModel
     {
         public Empleado Empleado { get; set; }
+        
         public List<Departamento> Departamentos { get; set; }
 
-        public SelectList Roles { get; set; }
+        public List<Posicion> Posiciones { get; set; }
     }
 }

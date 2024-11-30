@@ -1,0 +1,123 @@
+@model test2.Models.Departamento
+
+
+
+<div class="container row">
+    <div class="m-auto col-md-4">
+        <h1>Crear Departamento</h1>
+
+            <div class="row">
+                <div   class="form-group ">
+                        <label for="#input-departamento" class="control-label"></label>
+                        <input id="input-departamento"   class="form-control" />
+                        <span  class="text-danger"></span>
+                </div>
+                 
+            <div>
+                 <button type="button" id="save-departamento" class="btn btn-primary">Crear</button>
+            </div>
+       
+
+    </div>
+
+
+</div>
+ 
+    
+<div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
+    <strong ></strong> <span></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <script type="text/javascript">
+
+
+    
+        $(document).ready(function() {
+
+            var notification = $("#notification")
+
+            
+
+            var hostname = window.location.hostname;
+             var port = window.location.port;
+            // Código específico para la vista de crear producto
+            $('#save-departamento').click(function() {
+               
+                var value = $("#input-departamento").val();
+
+                if (value) {
+                    $.ajax({
+                        url: "http://"+hostname+':'+port+'/Departamentos/Create', // Asumiendo que tienes un método en el controlador
+                        type: 'POST',
+                         contentType: 'application/json',
+                        data:JSON.stringify( { Name: value }),
+                        success: function(data) {
+                            
+                            if(data.status=="success"){
+
+                                notification.removeClass('alert-warning');
+                                notification.addClass('alert-success');
+                                notification.find("strong").text(data.status)
+                                notification.find("span").text(data.message)
+                                notification.fadeIn()
+
+
+                                console.log(departamentos)
+
+                                const option = $('<option>', {})
+                                option.html(data.data.name)
+                                option.attr("value", data.data.id)
+
+
+                                departamentos.append(option)
+
+                                console.log(data)
+
+                                setTimeout(()=>{
+                                    notification.fadeOut()
+                                },5000)
+                            }else{
+
+                                notification.removeClass('alert-success');
+                                notification.addClass('alert-danger');
+                                notification.find("strong").text(data.status)
+                                notification.find("span").text(data.message)
+                                notification.fadeIn()
+                                setTimeout(() => {
+                                    notification.fadeOut()
+                                }, 5000)
+                                
+                            }
+                           
+
+                           @*  $('#subcategorySelect').empty();
+                            $.each(data, function(index, item) {
+                                $('#subcategorySelect').append('<option value="' + item.id + '">' + item.name + '</option>');
+                            }); *@
+                        },
+                        error: function() {
+                            alert('Error al cargar las subcategorías');
+                        }
+                    });
+                }
+            });
+
+
+          
+              
+              
+        });
+    </script>
+}

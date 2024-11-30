@@ -36,7 +36,9 @@ namespace test2.Controllers
         // GET: Empleado
         public async Task<IActionResult> Index()
         {
-           return View(await _context.Empleados.ToListAsync());
+            var empleados = await _context.Empleados.ToListAsync();
+
+           return View(empleados);
         }
 
         // GET: Empleado/Details/5
@@ -57,20 +59,23 @@ namespace test2.Controllers
             return View(empleado);
         }
 
-
+        [HttpGet]
         public IActionResult  Create()
         {
 
             
             var departamentos = getDepartamentos();
 
-            var roles = _context.Roles.ToList();
+            var posiciones= _context.Posiciones.ToList();
 
+            string json = JsonConvert.SerializeObject(departamentos);
 
+            _logger.LogInformation("{departamentos}",departamentos);
+            
             var viewModel = new CreateEmpleadoViewModel
             {
                 Departamentos =  departamentos,
-                Roles = new SelectList(roles, "RolID", "Name"),
+                Posiciones = posiciones
                 
             };
 
@@ -80,15 +85,88 @@ namespace test2.Controllers
         // POST: Empleado/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaDeNacimineto,RolID,DepartamentoID,Salario")] Empleado empleado)
+        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaDeNacimiento,PosicionID,DepartamentoID,Salario")] Empleado empleado)
         {
+
+            _logger.LogInformation("{q}",ModelState.IsValid);
+
             if (ModelState.IsValid)
             {
-                _context.Add(empleado);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try{
+
+                    // Asegurarse de que la fecha esté en UTC
+                    if (empleado.FechaDeNacimiento.Kind == DateTimeKind.Unspecified)
+                    {
+                        empleado.FechaDeNacimiento = DateTime.SpecifyKind(empleado.FechaDeNacimiento, DateTimeKind.Utc);
+                    }
+                    _context.Add(empleado);
+                    await _context.SaveChangesAsync();
+                
+                    return  RedirectToAction(nameof(Index));
+
+                } catch (DbEntityValidationException ex)
+                {
+                    Dictionary<string, string> diccionario = new Dictionary<string, string>();
+                    // Manejar la excepción de validación de entidad
+                    foreach (var eve in ex.EntityValidationErrors)
+                    {
+                        foreach (var ve in eve.ValidationErrors)
+                        {
+                            // Aquí puedes registrar el error, o agregar detalles adicionales
+                            diccionario.Add(ve.PropertyName, ve.ErrorMessage);
+                           // ModelState.AddModelError(ve.PropertyName, ve.ErrorMessage);
+                            
+                        }
+                    }
+                    string json = JsonConvert.SerializeObject(diccionario);
+
+                    return Json(json);
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Manejar la excepción de actualización en la base de datos (ej. errores de clave primaria o violación de restricciones)
+                    // Log o maneja el error específico
+                   // ModelState.AddModelError("", "Hubo un problema al guardar los datos en la base de datos. Intenta nuevamente.");
+               
+                    _logger.LogInformation("{S}",ex.Message);
+                }
+                catch (SqlException ex)
+                {
+                    // Manejar errores de SQL (conexión fallida, sintaxis errónea, etc.)
+                   // ModelState.AddModelError("", "Error al conectarse a la base de datos. Por favor, intenta más tarde.");
+                }
+                catch (Exception ex)
+                {
+                    Dictionary<string, string> diccionario = new Dictionary<string, string>();
+                    diccionario.Add("name","este  departamento ya existe");
+                    string json = JsonConvert.SerializeObject(diccionario);
+                    return Json(new{ status="error",message="validation error", error=json });
+                    // Manejo genérico de excepciones
+                  //  ModelState.AddModelError("", "Ocurrió un error inesperado: " + ex.Message);
+                }
+               
+
+               
             }
-            return View(empleado);
+
+
+             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+    {
+        // Muestra todos los errores
+        Console.WriteLine($"Error: {error.ErrorMessage}");
+    }
+            var departamentos = getDepartamentos();
+
+            var posiciones = _context.Posiciones.ToList();
+
+            var viewModel = new CreateEmpleadoViewModel
+            {   
+                Empleado=empleado,
+                Departamentos = departamentos,
+                Posiciones = posiciones
+
+            };
+            return View(viewModel);
         }
 
         private List<Departamento> getDepartamentos(){

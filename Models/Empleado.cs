@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace test2.Models
 {
@@ -23,18 +24,23 @@ namespace test2.Models
         public string Apellido { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]
-        public int RolID { get; set; }
+        public int PosicionID { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]
         public int DepartamentoID { get; set; }
 
-        [DataType(DataType.Date, ErrorMessage = "debe ser una fecha validda")]
-        public DataType FechaDeNacimineto {get;set;}
+        
+        public DateTime FechaDeNacimiento {get;set;}
         public decimal Salario { get; set; }
 
-        [ForeignKey("DepartamentoID")]
-        public virtual Departamento Departamento { get; set; }  // Relación con Categoria
-        [ForeignKey("RolID")]
-        public virtual Rol Rol { get; set; }  // Relación con Categoria
+    
+     public DateTime FechaDeNacimientoUtc
+    {
+        get => FechaDeNacimiento.Kind == DateTimeKind.Unspecified 
+               ? DateTime.SpecifyKind(FechaDeNacimiento, DateTimeKind.Utc)
+               : FechaDeNacimiento.ToUniversalTime();
+        set => FechaDeNacimiento = value.ToUniversalTime();
+    }
+
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace test2.Models
 {
-    public class Rol
+    public class Posicion
     {
         [Key] // Marca este campo como clave primaria
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Esto indica que es autoincremental
@@ -19,4 +19,5 @@ namespace test2.Models
         public virtual ICollection<Empleado> Empleados { get; set; }
 
     }
+    
 }
