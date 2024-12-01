@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using test2.Data;
 using test2.Models;
+using test2.Models.ResponseModels;
 using test2.Models.ViewModels;
 
 
@@ -47,6 +48,8 @@ namespace test2.Controllers
                                          .Take(PageSize)
                                          .ToList();
 
+          
+
             //var departamentos = _context.Departamentos.ToList();
 
 
@@ -67,7 +70,6 @@ namespace test2.Controllers
             return Json(roles);
         }
 
-
         [HttpGet]
         public IActionResult Create(){
 
@@ -75,24 +77,23 @@ namespace test2.Controllers
             return View();
         }
         
+
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Departamento departamento)
         {
-            /* if (id != empleado.Id)
-            {
-                return NotFound();
-            } */
+            
           
                  if(departamento!=null){
                     try
                     {
-                    if(DepartamentoExists(departamento.Name)) throw new Exception("este departamento ya existe");
-                    _context.Add(departamento);
-                    _context.SaveChanges();
-                    return Json(new { status = "success", message = "departamento added", data = departamento });
+                        if(DepartamentoExists(departamento.Name)) throw new Exception("este departamento ya existe");
+                        _context.Add(departamento);
+                        await _context.SaveChangesAsync();
+                        return Json(new { status = "success", message = "departamento added", data = departamento });
 
 
-                }
+                    }
                 catch (DbEntityValidationException ex)
                 {
                     Dictionary<string, string> diccionario = new Dictionary<string, string>();
@@ -111,32 +112,25 @@ namespace test2.Controllers
 
                     return Json(json);
                 }
-                catch (DbUpdateException ex)
-                {
-                    // Manejar la excepción de actualización en la base de datos (ej. errores de clave primaria o violación de restricciones)
-                    // Log o maneja el error específico
-                   // ModelState.AddModelError("", "Hubo un problema al guardar los datos en la base de datos. Intenta nuevamente.");
-                }
-                catch (SqlException ex)
-                {
-                    // Manejar errores de SQL (conexión fallida, sintaxis errónea, etc.)
-                   // ModelState.AddModelError("", "Error al conectarse a la base de datos. Por favor, intenta más tarde.");
-                }
-                catch (Exception ex)
-                {
-                    Dictionary<string, string> diccionario = new Dictionary<string, string>();
-                    diccionario.Add("name","este  departamento ya existe");
-                    string json = JsonConvert.SerializeObject(diccionario);
-                    return Json(new{ status="error",message="validation error", error=json });
-                    // Manejo genérico de excepciones
-                  //  ModelState.AddModelError("", "Ocurrió un error inesperado: " + ex.Message);
-                }
-               
-                 }
+              
+                
+                var message = ResponseMessages.GetErrorMessage(ResponseMessages.ErrorCode.database,"ERROR");
             
-        
-            return Json(new { status="error", message="validation error",data=departamento});
+               var response = new ResponseModel{
+                        Status="ERROR",
+                       
+                      
+                };
+                
+                return  Json(response);
+           
        
+        }
+
+        
+            return Json(new {
+                status="error",
+            });
         }
 
         private bool DepartamentoExists(string name)
@@ -145,29 +139,37 @@ namespace test2.Controllers
         }
 
 
-
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
+            {  
+
+             TempData["ErrorMessage"] = "Debes proporcionar un id  para modificar el departamento";
+
+             return RedirectToAction("index");
             }
 
             var departamento = await _context.Departamentos.FindAsync(id);
             if (departamento == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Este departamento ya no existe";
+
+                return RedirectToAction("index");
             }
             return View(departamento);
         }
         // POST: Empleado/Edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Departamento departamento)
         {
             if (id != departamento.Id)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Debes proporcionar un id  para modificar el departamento";
+
+                return RedirectToAction("index");
             }
 
             if (ModelState.IsValid)
@@ -193,7 +195,7 @@ namespace test2.Controllers
             return View(departamento);
         }
 
-
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

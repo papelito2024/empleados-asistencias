@@ -20,10 +20,10 @@
            <div class="row">
 
                 <div class="form-group col-md-6">
-                    <label asp-for="Empleado.DepartamentoID">Departamento</label>
+                    <label asp-for="Empleado.DepartamentoId">Departamento</label>
                     @if (Model.Departamentos != null)
                     {
-                        <select id="departamentos" asp-for="Empleado.DepartamentoID" class="form-control">
+                        <select id="departamentos" asp-for="Empleado.DepartamentoId" class="form-control">
                             <option value="">- Selecciona un Departamento -</option>
                             @foreach (var departamento in Model.Departamentos)
                             {
@@ -32,6 +32,7 @@
                                 </option>
                             }
                         </select>
+                        <span asp-validation-for="Empleado.DepartamentoId"></span>
                     }
                     else
                     {
@@ -57,10 +58,10 @@
         
             <div class="row">
                 <div class="form-group col-md-6">
-                    <label asp-for="Empleado.PosicionID">Posicion</label>
+                    <label asp-for="Empleado.PosicionId">Posicion</label>
                     @if (Model.Posiciones != null)
                     {
-                        <select id="posiciones" asp-for="Empleado.PosicionID" class="form-control">
+                        <select id="posiciones" asp-for="Empleado.PosicionId" class="form-control">
                             <option value="">- Selecciona una Posicion -</option>
                             @foreach (var posicion in Model.Posiciones)
                             {
@@ -69,6 +70,7 @@
                                 </option>
                             }
                         </select>
+                        <span asp-validation-for="Empleado.PosicionId"></span>
                     }
                     else
                     {

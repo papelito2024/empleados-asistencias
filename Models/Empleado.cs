@@ -19,22 +19,30 @@ namespace test2.Models
         [StringLength(40)]
         public string Nombre { get; set; }
 
-        [Required(ErrorMessage = "Este campo es requerido")]
+        [Required(ErrorMessage = "apellito Este campo es requerido")]
         [StringLength(40)]
         public string Apellido { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]
-        public int PosicionID { get; set; }
+        public int PosicionId { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]
-        public int DepartamentoID { get; set; }
+        public int DepartamentoId { get; set; }
 
-        
+       
+        public virtual  Departamento Departamento { get; set; }
+       
+        public virtual Posicion Posicion { get; set; } 
+
+        [Required(ErrorMessage = "adasdasd Este campo es requerido")]
         public DateTime FechaDeNacimiento {get;set;}
+
+        [Required(ErrorMessage = "12232312o Este campo es requerido")]
         public decimal Salario { get; set; }
 
-    
-     public DateTime FechaDeNacimientoUtc
+
+
+        public DateTime FechaDeNacimientoUtc
     {
         get => FechaDeNacimiento.Kind == DateTimeKind.Unspecified 
                ? DateTime.SpecifyKind(FechaDeNacimiento, DateTimeKind.Utc)

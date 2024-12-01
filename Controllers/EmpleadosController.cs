@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Data.SqlClient;
 using System.Data.Entity.Validation;
+using System.Collections;
 
 
 
@@ -33,12 +34,86 @@ namespace test2.Controllers
         }
 
 
-        // GET: Empleado
-        public async Task<IActionResult> Index()
-        {
-            var empleados = await _context.Empleados.ToListAsync();
 
-           return View(empleados);
+        /*   private async Task<IEnumerable<object>>  PaginateAndFilter(int pageNumber,int pageSize)
+          {
+
+              var Data = await (from empleado in _context.Empleados
+                                       join departamento in _context.Departamentos
+                                       on empleado.DepartamentoID equals departamento.Id
+                                       join posicion in _context.Posiciones
+                                       on empleado.PosicionID equals posicion.Id
+                                      /*  where category.Name.Contains(categoryName)  // Filtro por categoría
+                                       orderby product.Name  // Ordenar por nombre de producto 
+                                       select new
+                                       {
+                                          empleado.Nombre,
+                                          empleado.Apellido,
+                                          empleado.FechaDeNacimiento,
+                                          departamento=departamento.Name,
+                                          posicion=posicion.Name,
+
+                                       })
+                            .Skip((pageNumber - 1) * pageSize)  // Paginación: saltar elementos de páginas anteriores
+                            .Take(pageSize)  // Tomar los elementos de la página actual
+                            .ToListAsync();  // Ejecutar la consulta de manera asíncrona
+
+
+              return Data;
+          }
+   */
+
+        public async Task<PaginacionViewModel<Empleado>> PaginateAndFilter(int pageNumber, int pageSize)
+        {
+            // Create the base query to fetch the employees
+            var query = from empleado in _context.Empleados
+                        join departamento in _context.Departamentos
+                            on empleado.DepartamentoId equals departamento.Id
+                        join posicion in _context.Posiciones
+                            on empleado.PosicionId equals posicion.Id
+                        select new Empleado
+                        {
+                            Nombre = empleado.Nombre,
+                            Apellido = empleado.Apellido,
+                            FechaDeNacimiento = empleado.FechaDeNacimiento,
+                            Departamento = new Departamento {
+                                Id=departamento.Id,
+                                Name=departamento.Name
+                            },
+                            Posicion = new Posicion{
+                                Id = posicion.Id,
+                                Name=posicion.Name,
+                            }
+                        };
+
+            // Total count before pagination (for calculating the total number of pages)
+            var totalCount =  await query.CountAsync();
+
+            // Apply pagination: skip previous pages and take the current page's items
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)  // Skip elements from previous pages
+                .Take(pageSize)  // Take elements for the current page
+                .ToListAsync();  // Execute the query asynchronously
+
+            // Construct and return the PaginacionViewModel with pagination details
+            return new PaginacionViewModel<Empleado>
+            {
+                Items = items,
+                TotalItems = totalCount,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+        // GET: Empleado
+        public async Task<IActionResult> Index(int page=1)
+        {
+           var empleados = await PaginateAndFilter(page,5);
+
+            var totalItems = _context.Empleados.Count();
+
+          
+
+            return View(empleados);
         }
 
         // GET: Empleado/Details/5
@@ -85,10 +160,21 @@ namespace test2.Controllers
         // POST: Empleado/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaDeNacimiento,PosicionID,DepartamentoID,Salario")] Empleado empleado)
+        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaDeNacimiento,PosicionId,DepartamentoId,Salario")] Empleado empleado)
         {
 
-            _logger.LogInformation("{q}",ModelState.IsValid);
+           
+            if(!ModelState.IsValid){
+                var errorKeys = ModelState.Keys;
+                foreach (var key in errorKeys)
+            {
+                var errorMessages = ModelState[key].Errors.Select(e => e.ErrorMessage).ToList();
+                
+                // Aquí puedes hacer lo que quieras con las claves y los mensajes
+                Console.WriteLine($"Key: {key}, Errors: {string.Join(", ", errorMessages)}");
+            }
+            }
+               
 
             if (ModelState.IsValid)
             {
@@ -148,12 +234,18 @@ namespace test2.Controllers
 
                
             }
+            
 
-
-             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+             foreach (var error in ModelState.Values.SelectMany(v => {
+                    
+                     Console.WriteLine($"Error:{v.Children}  {v.RawValue}");
+               
+                return v.Errors;
+             }))
     {
         // Muestra todos los errores
-        Console.WriteLine($"Error: {error.ErrorMessage}");
+        
+        Console.WriteLine($"Error: {error.ErrorMessage}  {error.GetType()}");
     }
             var departamentos = getDepartamentos();
 

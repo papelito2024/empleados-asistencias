@@ -7,13 +7,13 @@ namespace test2.Models.ResponseModels
 {
     public class ResponseModel
     {
-        string Status {get;set;}
+       public  string Status {get;set;}
 
-        string Message {get;set;}
+        public  string Message {get;set;}
 
-        int Code {get;set;}
+        public  int StatusCode {get;set;}
 
-        Dictionary<string, string> Data {get; set;}
+         public object Data {get; set;}
 
 
     

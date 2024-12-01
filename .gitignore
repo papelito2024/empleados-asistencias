@@ -1,9 +1,21 @@
 
-Migrations/
+/obj/
 
+/packages/
 
-obj/
+/bin/
 
+/.vs/
+/vscode/
+/wwwroot/
+.vscode/
+.idea/
+*.user
+*.suo
+*.db
+*.log
+*.vspscc
+/node_modules/
 
-
-bin/
+/appsettings.json
+/appsettings.*.json
