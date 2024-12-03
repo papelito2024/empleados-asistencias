@@ -26,36 +26,67 @@ namespace test2.Controllers
 
         private readonly ApplicationDbContext _context;
 
+       
+
         public DepartamentosController(ApplicationDbContext context,ILogger<DepartamentosController> logger)
         {
-            _logger = logger;
+          //  _logger = logger;
             _context = context;
         }
 
-        public IActionResult Index(int page=1)
+        public IQueryable<T> ObtenerDatos<T>() where T : class
+        {
+            return _context.Set<T>().AsQueryable(); // Esto hace la consulta genérica para cualquier tipo de entidad
+        }
+
+        public IActionResult Index(int page=1,[FromQuery]string search=null)
         {
             // Calcular el total de elementos
             var totalItems = _context.Departamentos.Count();
 
             //page size
-            int PageSize=5;
+            int PageSize=3;
             // Calcular los elementos a saltar para la paginación
             var skip = (page - 1) * PageSize;
 
             // Obtener los elementos de la página actual
-            var departamentos = _context.Departamentos
-                                         .Skip(skip)
-                                         .Take(PageSize)
-                                         .ToList();
+            var departamentos = _context.Departamentos;
 
-          
+
+            var query = ObtenerDatos<Departamento>();
+
+            List<Departamento> response;
+
+            if (search !=null){
+                _logger.LogInformation("asdasdasd {a}",search);
+
+                search = search != null ? search :"";
+                query = departamentos.Where(u => u.Name.ToLower().Contains(search.ToLower()));
+
+
+                response= query.ToList();
+            }else{
+
+                response=departamentos.ToList();
+            }
+
+            
+    
+           
+
+            
+
+            
+
+
+           // _logger.LogInformation("{}",response.Count);
 
             //var departamentos = _context.Departamentos.ToList();
 
 
             var model = new PaginacionViewModel<Departamento>
             {
-                Items = departamentos,
+                Items = response,
                 TotalItems = totalItems,
                 PageSize = PageSize,
                 CurrentPage = page
@@ -172,46 +203,54 @@ namespace test2.Controllers
                 return RedirectToAction("index");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(departamento);
                     await _context.SaveChangesAsync();
+                      TempData["success"] = "Departamento editado exitosamente";
+
+                return RedirectToAction("index");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DepartamentoExists(departamento.Name))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                   
                 }
-                return RedirectToAction(nameof(Index));
+              
             }
-            return View(departamento);
+            TempData["error"] = "Datos proporcionados invalidos";
+
+             return RedirectToAction("index");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+               
+                 TempData["error"] = "No se ha proporcionado ninguna poscicion a eliminar";
+                return RedirectToAction("Index","Departamentos");
+
             }
 
-            var departamento = await _context.Departamentos
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (departamento == null)
+            var posicion =  _context.Departamentos.FirstOrDefault(m => m.Id == id);
+           
+            if (posicion == null)
             {
-                return NotFound();
+                
+                 TempData["error"] = "No existe la posicion en la base dedatoso";
+                return RedirectToAction("Index","Departamentos");
+
             }
 
-            return View(departamento);
+             _context.Departamentos.Remove(posicion);
+                await _context.SaveChangesAsync();
+
+            TempData["success"] = "Se elimino la poscicion con exito";
+                return RedirectToAction("Index","Departamentos");
         }
+
 
         // POST: Empleado/Delete/5
         [HttpPost, ActionName("Delete")]

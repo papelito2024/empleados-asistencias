@@ -20,6 +20,8 @@ namespace test2.Data
 
             public DbSet<Posicion> Posiciones { get; set; }
 
+             public DbSet<Asistencia> Asistencias { get; set; }
+
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 base.OnModelCreating(modelBuilder);  // Llamada al método base

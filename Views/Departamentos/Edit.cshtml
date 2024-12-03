@@ -5,22 +5,24 @@
     <div class="m-auto col-md-5">
         <h1>Editar Departamento</h1>
 
-        <form asp-action="Edit" method="post">
-            
-            
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control"  asp-value="@Model.Name"/>
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-           
+        @using (Html.BeginForm("Edit", "Departamentos", new { id = Model.Id }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken() <!-- Para protección contra ataques CSRF -->
 
-            <br>
-           <div>
-                <button type="submit" class="btn btn-primary">Editar</button>
-           </div>
-           
-        </form>
+            <div class="form-group">
+
+                @Html.HiddenFor(m => m.Id)
+                <!-- Usamos HiddenFor para que el Id sea enviado en el formulario pero no sea visible -->
+            </div>
+
+            <div class="form-group">
+                <label for="Name"></label>
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Nombre del departamento" })
+                <!-- Campo de texto para editar el Name -->
+            </div>
+
+            <button type="submit" class="btn btn-primary">Editar</button>
+        }
 
     </div>
 

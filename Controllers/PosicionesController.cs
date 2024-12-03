@@ -74,8 +74,8 @@ namespace test2.Controllers
         [HttpGet]
          public IActionResult Create(){
 
-
-            return View();
+     
+            return View(new PosicionCreateViewModel{});
         }
 
         [HttpPost]
@@ -143,20 +143,28 @@ namespace test2.Controllers
         }
 
 
-
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                TempData["error"] = "Debes proporcionar un id para editar la posicion";
+                return RedirectToAction("Index","Posiciones");
             }
 
             var posicion = await _context.Posiciones.FindAsync(id);
             if (posicion == null)
             {
-                return NotFound();
+                 TempData["error"] = "La poscion especificada no existe en la base dedatos";
+                return RedirectToAction("Index","Posiciones");
             }
-            return View(posicion);
+
+            
+            var model = new Posicion{
+                Id=posicion.Id,
+                Name=posicion.Name
+            };
+            return View(model);
         }
         
         
@@ -167,30 +175,37 @@ namespace test2.Controllers
         {
             if (id != posicion.Id)
             {
-                return NotFound();
+
+
+                _logger.LogInformation("{id} {id} {true} ",id,posicion.Id);
+                 TempData["error"] = "No es la posicion correcta para editar or valor de id incorrecto";
+                return RedirectToAction("Index","Posiciones");
+
+                
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(posicion);
                     await _context.SaveChangesAsync();
+
+                        TempData["error"]=null;
+                     TempData["success"] = "Se edito la posicion exitosamente";
+                return RedirectToAction("Index","Posiciones");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PosicionExists(posicion))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                   
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
-            return View(posicion);
+
+                     TempData["error"] = "datos invalidos ";
+                return RedirectToAction("Index","Posiciones");
+           return RedirectToAction(nameof(Index));
+          
         }
 
 
@@ -208,33 +223,30 @@ namespace test2.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+               
+                 TempData["error"] = "No se ha proporcionado ninguna poscicion a eliminar";
+                return RedirectToAction("Index","Posiciones");
+
             }
 
-            var posicion = await _context.Posiciones.FirstOrDefaultAsync(m => m.Id == id);
+            var posicion =  _context.Posiciones.FirstOrDefault(m => m.Id == id);
            
             if (posicion == null)
             {
-                return NotFound();
+                
+                 TempData["error"] = "No existe la posicion en la base dedatoso";
+                return RedirectToAction("Index","Posiciones");
+
             }
 
-            return View(posicion);
-        }
-
-        // POST: Empleado/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var posicion = await _context.Posiciones.FindAsync(id);
-            if (posicion != null)
-            {
-                _context.Posiciones.Remove(posicion);
+             _context.Posiciones.Remove(posicion);
                 await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(Index));
+
+            TempData["success"] = "Se elimino la poscicion con exito";
+                return RedirectToAction("Index","Posiciones");
         }
 
+        
 
 
 

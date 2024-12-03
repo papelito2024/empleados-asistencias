@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using test2.Data;
@@ -11,9 +12,11 @@ using test2.Data;
 namespace test2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241202071946_fecha144")]
+    partial class fecha144
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,31 +24,6 @@ namespace test2.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("test2.Models.Asistencia", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmpleadoId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("FechaControl")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmpleadoId");
-
-                    b.ToTable("Asistencias");
-                });
 
             modelBuilder.Entity("test2.Models.Departamento", b =>
                 {
@@ -94,9 +72,8 @@ namespace test2.Migrations
                     b.Property<int>("PosicionId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Sexo")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Salario")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -121,18 +98,7 @@ namespace test2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posiciones");
-                });
-
-            modelBuilder.Entity("test2.Models.Asistencia", b =>
-                {
-                    b.HasOne("test2.Models.Empleado", "Empleado")
-                        .WithMany()
-                        .HasForeignKey("EmpleadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Empleado");
+                    b.ToTable("Posicion");
                 });
 
             modelBuilder.Entity("test2.Models.Empleado", b =>

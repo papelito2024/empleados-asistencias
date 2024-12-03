@@ -10,7 +10,6 @@ namespace test2.Models
     public class Departamento
     {
         [Key] // Marca este campo como clave primaria
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Esto indica que es autoincremental
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]

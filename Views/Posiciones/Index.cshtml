@@ -5,8 +5,20 @@
 
 <h1>Posiciones</h1>
 
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
 <p>
-    <a class="btn btn-primary" href="@Url.Action("Create", "Departamentos")">Crear nueva posicion</a>
+    <a class="btn btn-primary" href="@Url.Action("Create", "Posiciones")">Crear nueva posicion</a>
 </p>
 
 <table class="table">

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using test2.Data;
@@ -11,9 +12,11 @@ using test2.Data;
 namespace test2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241202083829_addtable")]
+    partial class addtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +97,8 @@ namespace test2.Migrations
                     b.Property<int>("PosicionId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Sexo")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Salario")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 

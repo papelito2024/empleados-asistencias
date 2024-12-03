@@ -1,0 +1,191 @@
+@model test2.Models.ViewModels.AsistenciasViewModel
+@{
+    ViewData["Title"] = "Empleados";
+}
+
+
+@{
+   var hostname = Context.Request.Host.Host;  // Obtiene el hostname
+    var port = Context.Request.Host.Port;
+}
+
+<div>
+
+@if (ViewData["error"] != null)
+{
+    <div class="alert alert-danger">
+            @ViewData["error"]
+    </div>
+}
+
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["success"]
+        </div>
+    }
+
+    
+    <h1>Asistencia de Empleados</h1>
+
+    <div class="row">
+
+        <div class="col-md-6">
+                 <div >
+
+   
+
+        <div class="input-group mb-3">
+
+            <input id="id-empleado" type="text" class="form-control" placeholder="buscar empleado por id" />
+
+            <div class="input-group-append">
+                <button id="buscar" class="btn btn-outline-secondary" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-search" viewBox="0 0 16 16">
+                        <path
+                            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    
+        @section Scripts {
+            <script type="text/javascript">
+                $("#buscar").on("click", (e) => {
+                    const search = $("#id-empleado").val()
+                    window.location.href = `http://${window.location.hostname}:${window.location.port}/Asistencias/Index?id=${search}`
+                })
+            </script>
+        }
+    </div>
+    <div>
+       @if(Model!=null && Model.Empleado !=null){
+
+                <div class="card" style="width: 18rem;">
+                    @if(Model.Empleado.Sexo=="masculino"){
+                    <img class="card-img-top" src="https://cdn-icons-png.flaticon.com/512/10529/10529226.png"
+                        alt="Card image cap">
+                    }else{
+                        <img class="card-img-top" src=" https://th.bing.com/th/id/R.421bb41bcaefecc17d0bc43574ee1a4c?rik=013lt2brDG6w6Q&pid=ImgRaw&r=0"  alt="Card image cap">
+                     }
+                      
+                    <div class="card-body">
+                    <h5 class="card-title">@Model.Empleado.Nombre @Model.Empleado.Apellido</h5>
+                        <p class="card-text">
+
+                        @if (Model.Estado=="retirado"){
+                        <p>Estado Actual <span class="badge text-bg-danger p-1">Ausente</span></p>
+                            <a class="btn btn-success"
+                                href="ToggleAsistencia?id=@Model.Empleado.Id">Asistencia</a>
+
+                        }else if(Model.Estado=="asistido"){
+                        <p>Estado Actual <span class="badge text-bg-success p-1">Presente</span></p>
+                            <a class="btn btn-danger"
+                                href="ToggleAsistencia?id=@Model.Empleado.Id">Retirar</a>
+                        }
+                        else{
+                            <p>primera asisteencia</p>
+                        <p>Estado Actual <span class="badge text-bg-danger p-1">Ausente</span></p>
+                        <a class="btn btn-success"
+                            href="ToggleAsistencia?id=@Model.Empleado.Id">Asistencia</a>
+                        }
+                        </p>
+                     
+                    </div>
+                </div>
+         }
+
+           
+       
+        </div>
+    </div>
+    <div class="col-md-6">
+                <div class="calendar-container">
+    <div class="calendar-header">
+      <button class="prev-btn" onclick="changeMonth(-1)">&#10094;</button>
+      <h2 id="month-year"></h2>
+      <button class="next-btn" onclick="changeMonth(1)">&#10095;</button>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+        </div>
+
+    </div>
+   
+ 
+
+    <script type="text/javascript">
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        // Función para actualizar el calendario
+        function updateCalendar() {
+        // Obtenemos el primer día del mes actual
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+
+        // Nombre del mes
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        document.getElementById("month-year").textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+        // Limpiar la cuadrícula del calendario
+        const calendarGrid = document.getElementById("calendar-grid");
+        calendarGrid.innerHTML = "";
+
+        // Días de la semana
+        const weekdays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        for (let i = 0; i < weekdays.length; i++) {
+            const dayLabel = document.createElement("div");
+            dayLabel.textContent = weekdays[i];
+            calendarGrid.appendChild(dayLabel);
+        }
+
+        // Crear celdas para los días
+        for (let i = 0; i < firstDay.getDay(); i++) {
+            const emptyCell = document.createElement("div");
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        // Días del mes
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dayCell = document.createElement("div");
+            dayCell.textContent = day;
+
+            dayCell.addEventListener("click",function(e){
+
+                alert();
+            })
+
+            // Agregar un icono (puedes reemplazarlo con el que prefieras)
+            const icon = document.createElement("i");
+            
+            icon.className = "bi bi-check";
+            icon.classList.add("icon");
+
+            dayCell.appendChild(icon);
+            calendarGrid.appendChild(dayCell);
+        }
+        }
+
+        // Función para cambiar de mes
+        function changeMonth(direction) {
+        currentMonth += direction;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        updateCalendar();
+        }
+
+        // Inicializamos el calendario
+        updateCalendar();
+
+    </script> 
+    
+
+</div>

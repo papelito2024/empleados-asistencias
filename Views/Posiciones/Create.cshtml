@@ -1,8 +1,14 @@
-@model test2.Models.Departamento
+@model test2.Models.ViewModels.PosicionCreateViewModel
 
 
 
 <div class="container row">
+
+    <div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
+        <strong></strong> <span></span>
+        
+    </div>
+
     <div class="m-auto col-md-4">
         <h1>Crear Posicion</h1>
 
@@ -24,13 +30,7 @@
     </div>
 
 
-    <div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
-        <strong></strong> <span></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-
+  
 
 
     @section Scripts {
@@ -59,7 +59,7 @@
 
                     if (value) {
                         $.ajax({
-                            url: "http://" + hostname + ':' + port + '/Departamentos/Create', // Asumiendo que tienes un método en el controlador
+                            url: "http://" + hostname + ':' + port + '/Posiciones/Create', // Asumiendo que tienes un método en el controlador
                             type: 'POST',
                             contentType: 'application/json',
                             data: JSON.stringify({ Name: value }),

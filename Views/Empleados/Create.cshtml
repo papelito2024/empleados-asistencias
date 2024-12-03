@@ -1,6 +1,25 @@
 @model test2.Models.ViewModels.CreateEmpleadoViewModel
 
 <div class="container row">
+
+@{
+   var error = TempData["error"];
+   var success = TempData["success"];
+}  
+
+    @if (error != null)
+    {
+        <div class="alert alert-danger">
+            @error
+        </div>
+    }
+
+    @if (success != null)
+    {
+        <div class="alert alert-success">
+            @success
+        </div>
+    }
     <div class="m-auto col-md-8">
         <h1>Crear Empleado</h1>
 
@@ -16,7 +35,9 @@
                     <input asp-for="Empleado.Apellido" class="form-control" />
                     <span asp-validation-for="Empleado.Apellido" class="text-danger"></span>
                 </div>
+                
             </div>
+            
            <div class="row">
 
                 <div class="form-group col-md-6">
@@ -70,7 +91,7 @@
                                 </option>
                             }
                         </select>
-                        <span asp-validation-for="Empleado.PosicionId"></span>
+                        <span asp-validation-for="Empleado.PosicionId" class="text-danger"></span>
                     }
                     else
                     {
@@ -94,17 +115,34 @@
             </div>
          
         
-            <div class="form-group ">
+           
+        <div class="row">
+
+             <div class="form-group ">
                         <label asp-for="Empleado.FechaDeNacimiento" class="control-label"></label>
                         <input asp-for="Empleado.FechaDeNacimiento" class="form-control" />
                 <span asp-validation-for="Empleado.FechaDeNacimiento" class="text-danger"></span>
                 </div>
-       
-            <div class="form-group">
-                <label asp-for="Empleado.Salario" class="control-label"></label>
-                <input asp-for="Empleado.Salario" class="form-control" />
-                <span asp-validation-for="Empleado.Salario" class="text-danger"></span>
-            </div>
+
+                <div class="form-group  col-md-6">
+
+                    <label asp-for="Empleado.Sexo" class="control-label"></label>
+
+                   <div class="p-2">
+                        @Html.RadioButtonFor(m => m.Empleado.Sexo, "Masculino", new { id = "sexoMasculino" }) Masculino
+
+
+                        @Html.RadioButtonFor(m => m.Empleado.Sexo, "Femenino", new { id = "sexoFemenino" }) Femenino
+
+                        @Html.RadioButtonFor(m => m.Empleado.Sexo, "Otro", new { id = "sexoOtro" }) Otro
+
+                   </div>
+                </div>
+
+              
+
+        </div>
+            
             
             
            <div class="p-3 d-flex f-gap-1">

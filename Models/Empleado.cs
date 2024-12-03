@@ -29,17 +29,19 @@ namespace test2.Models
         [Required(ErrorMessage = "Este campo es requerido")]
         public int DepartamentoId { get; set; }
 
-       
+        [Required(ErrorMessage = "Este campo es requerido")]
+        public string  Sexo { get; set; } 
+
         public virtual  Departamento Departamento { get; set; }
+       
        
         public virtual Posicion Posicion { get; set; } 
 
         [Required(ErrorMessage = "adasdasd Este campo es requerido")]
+        [DataType(DataType.Date)]
         public DateTime FechaDeNacimiento {get;set;}
 
-        [Required(ErrorMessage = "12232312o Este campo es requerido")]
-        public decimal Salario { get; set; }
-
+       
 
 
         public DateTime FechaDeNacimientoUtc

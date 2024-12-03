@@ -14,11 +14,11 @@
     <table class="table">
         <thead>
             <tr>
+                 <th>Id</th>
                 <th>Nombre</th>
                 <th>Departamento</th>
-                <th>Pos</th>
+                <th>Posicion</th>
                 <th>Fecha Nac</th>
-                <th>Salario</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -26,11 +26,12 @@
             @foreach (var item in Model.Items)
             {
                 <tr>
+                    <td>@item.Id</td>
                     <td>@item.Nombre @item.Apellido</td>
                     <td>@item.Departamento.Name</td>
                     <td>@item.Posicion.Name</td>
                     <td>@item.FechaDeNacimiento.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Salario</td>
+                    
                     <td>
                         <a class="btn btn-info" href="@Url.Action("Details", new { id = item.Id })">Ver</a>
                         <a class="btn btn-warning" href="@Url.Action("Edit", new { id = item.Id })">Editar</a>

@@ -1,27 +1,42 @@
-@model test2.Models.Departamento
+@model test2.Models.Posicion
 
 <div class="container row">
 
+
+
+    <div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
+        <strong></strong> <span></span>
+      
+    </div>
+
+
+    @if (TempData["error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["error"]
+        </div>
+    }
     <div class="m-auto col-md-5">
-        <h1>Editar Departamento</h1>
-
-        <form asp-action="Edit" method="post">
+        <h1>Editar Posicion</h1>
 
 
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" asp-value="@Model.Name" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
+       <!-- Formulario para editar la Posición -->
+@using (Html.BeginForm("Edit", "Posiciones",  new { id = Model.Id },FormMethod.Post))
+{
+    @Html.AntiForgeryToken()  <!-- Para protección contra ataques CSRF -->
 
+    <div class="form-group">
+       
+        @Html.HiddenFor(m => m.Id)  <!-- Usamos HiddenFor para que el Id sea enviado en el formulario pero no sea visible -->
+    </div>
 
-            <br>
-            <div>
-                <button type="submit" class="btn btn-primary">Editar</button>
-            </div>
+    <div class="form-group">
+        <label for="Name">Nombre de la Posición</label>
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Nombre de la Posición" }) <!-- Campo de texto para editar el Name -->
+    </div>
 
-        </form>
-
+    <button type="submit" class="btn btn-primary">Editar</button>
+}
     </div>
 
 
@@ -34,12 +49,3 @@
 
 
 
-
-
-
-<div id="notification" style="display: none;" class="alert alert-success alert-dismissible" role="alert">
-    <strong></strong> <span></span>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using test2.Data;
 using test2.Models;
 using test2.Models.ViewModels;
@@ -15,6 +16,7 @@ using Newtonsoft.Json;
 using System.Data.SqlClient;
 using System.Data.Entity.Validation;
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 
 
 
@@ -160,105 +162,80 @@ namespace test2.Controllers
         // POST: Empleado/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nombre,Apellido,FechaDeNacimiento,PosicionId,DepartamentoId,Salario")] Empleado empleado)
+        public async Task<IActionResult> Create(Empleado empleado)
         {
 
-           
-            if(!ModelState.IsValid){
-                var errorKeys = ModelState.Keys;
-                foreach (var key in errorKeys)
+            if (!ModelState.IsValid)
             {
-                var errorMessages = ModelState[key].Errors.Select(e => e.ErrorMessage).ToList();
-                
-                // Aquí puedes hacer lo que quieras con las claves y los mensajes
-                Console.WriteLine($"Key: {key}, Errors: {string.Join(", ", errorMessages)}");
-            }
-            }
-               
 
-            if (ModelState.IsValid)
-            {
-                try{
-
-                    // Asegurarse de que la fecha esté en UTC
-                    if (empleado.FechaDeNacimiento.Kind == DateTimeKind.Unspecified)
-                    {
+                string e = JsonConvert.SerializeObject(empleado);
+                _logger.LogInformation(" {s}, ", e);
+       
+                // Asegurarse de que la fecha esté en UTC
+                if (empleado.FechaDeNacimiento.Kind == DateTimeKind.Unspecified){
                         empleado.FechaDeNacimiento = DateTime.SpecifyKind(empleado.FechaDeNacimiento, DateTimeKind.Utc);
                     }
-                    _context.Add(empleado);
-                    await _context.SaveChangesAsync();
-                
-                    return  RedirectToAction(nameof(Index));
-
-                } catch (DbEntityValidationException ex)
+                try
                 {
-                    Dictionary<string, string> diccionario = new Dictionary<string, string>();
-                    // Manejar la excepción de validación de entidad
-                    foreach (var eve in ex.EntityValidationErrors)
-                    {
-                        foreach (var ve in eve.ValidationErrors)
-                        {
-                            // Aquí puedes registrar el error, o agregar detalles adicionales
-                            diccionario.Add(ve.PropertyName, ve.ErrorMessage);
-                           // ModelState.AddModelError(ve.PropertyName, ve.ErrorMessage);
-                            
-                        }
-                    }
-                    string json = JsonConvert.SerializeObject(diccionario);
+                    _context.Add(empleado);
+                    Console.WriteLine(_context.SaveChanges());
 
-                    return Json(json);
+                      TempData["success"] = "Empleado registrado exitosamente";
+
+                return RedirectToAction("index");
                 }
                 catch (DbUpdateException ex)
                 {
-                    // Manejar la excepción de actualización en la base de datos (ej. errores de clave primaria o violación de restricciones)
-                    // Log o maneja el error específico
-                   // ModelState.AddModelError("", "Hubo un problema al guardar los datos en la base de datos. Intenta nuevamente.");
-               
-                    _logger.LogInformation("{S}",ex.Message);
+                    // Manejar errores de actualización en la base de datos (violación de clave, etc.)
+                    Console.WriteLine($"Error en la base de datos: {ex.Message}");
                 }
-                catch (SqlException ex)
+               
+                catch (ValidationException ex)
                 {
-                    // Manejar errores de SQL (conexión fallida, sintaxis errónea, etc.)
-                   // ModelState.AddModelError("", "Error al conectarse a la base de datos. Por favor, intenta más tarde.");
+                    // Manejar errores de validación
+                    Console.WriteLine($"Error de validación: {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Dictionary<string, string> diccionario = new Dictionary<string, string>();
-                    diccionario.Add("name","este  departamento ya existe");
-                    string json = JsonConvert.SerializeObject(diccionario);
-                    return Json(new{ status="error",message="validation error", error=json });
-                    // Manejo genérico de excepciones
-                  //  ModelState.AddModelError("", "Ocurrió un error inesperado: " + ex.Message);
+                    // Captura cualquier otra excepción general
+                    Console.WriteLine($"Error inesperado: {ex.Message}");
                 }
-               
 
+
+
+                var departamentos = getDepartamentos();
+
+                    var posiciones = _context.Posiciones.ToList();
+
+                    var viewModel = new CreateEmpleadoViewModel
+                    {
+                        Empleado = empleado,
+                        Departamentos = departamentos,
+                        Posiciones = posiciones
+
+                    };
+                    return View(viewModel);
+
+                
                
+            }else{
+                var departamentos = getDepartamentos();
+
+                var posiciones = _context.Posiciones.ToList();
+
+                var viewModel = new CreateEmpleadoViewModel
+                {
+                    Empleado = empleado,
+                    Departamentos = departamentos,
+                    Posiciones = posiciones
+
+                };
+                return View(viewModel);
             }
             
 
-             foreach (var error in ModelState.Values.SelectMany(v => {
-                    
-                     Console.WriteLine($"Error:{v.Children}  {v.RawValue}");
-               
-                return v.Errors;
-             }))
-    {
-        // Muestra todos los errores
-        
-        Console.WriteLine($"Error: {error.ErrorMessage}  {error.GetType()}");
-    }
-            var departamentos = getDepartamentos();
-
-            var posiciones = _context.Posiciones.ToList();
-
-            var viewModel = new CreateEmpleadoViewModel
-            {   
-                Empleado=empleado,
-                Departamentos = departamentos,
-                Posiciones = posiciones
-
-            };
-            return View(viewModel);
+ 
+           
         }
 
         private List<Departamento> getDepartamentos(){
